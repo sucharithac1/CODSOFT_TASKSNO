@@ -1,0 +1,76 @@
+import pandas as pd
+
+
+df = pd.read_csv("dataset/CODSOFT_Task1_Sales_Data.csv")
+
+
+print("First 5 rows:")
+print(df.head())
+
+print("\nDataset shape:")
+print(df.shape)
+
+print("\nColumn names:")
+print(df.columns.tolist())
+
+
+print("\nMissing values:")
+print(df.isnull().sum())
+
+
+print("\nDuplicate rows:")
+print(df.duplicated().sum())
+
+
+print("\nData types:")
+print(df.dtypes)
+
+
+df = df.drop_duplicates()
+
+
+text_columns = ["Product", "City", "Payment_Method"]
+
+for column in text_columns:
+    df[column] = df[column].astype("string").str.strip()
+
+
+df["City"] = df["City"].str.title()
+
+
+df["Payment_Method"] = df["Payment_Method"].str.upper()
+
+df["Quantity"] = pd.to_numeric(df["Quantity"], errors="coerce")
+df["Price"] = pd.to_numeric(df["Price"], errors="coerce")
+
+
+df["Quantity"] = df["Quantity"].fillna(df["Quantity"].median())
+df["Price"] = df["Price"].fillna(df["Price"].median())
+
+df["City"] = df["City"].fillna(df["City"].mode()[0])
+df["Payment_Method"] = df["Payment_Method"].fillna(
+    df["Payment_Method"].mode()[0]
+)
+df["Product"] = df["Product"].fillna(df["Product"].mode()[0])
+
+
+df["Order_Date"] = pd.to_datetime(
+    df["Order_Date"],
+    errors="coerce"
+)
+
+
+print("\nMissing values after cleaning:")
+print(df.isnull().sum())
+
+print("\nDuplicate rows after cleaning:")
+print(df.duplicated().sum())
+
+print("\nFinal dataset shape:")
+print(df.shape)
+df.to_csv(
+    "output/cleaned_sales_data.csv",
+    index=False
+)
+
+print("\nCleaned dataset saved successfully!")
